@@ -1,0 +1,8 @@
+# gitignore
+
+.godot/
+addons/*
+bin/*
+
+!**/.gitkeep
+!**/.gdignore

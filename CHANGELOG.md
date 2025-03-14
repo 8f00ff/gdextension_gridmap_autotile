@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A demo Godot project to test and showcase the extension
+- Basic wall and floor mesh tiles for the demo
+- A sample scene with GridMapAutoTile
 - New node GridMapAutoTile that extends GridMap with autotiling capabilities
 - Support for special naming scheme in MeshLibrary: `type-bitmask[-variant]`
 - Autotiling logic for 4 cardinal directions using bitmasks to define tile types and connections
