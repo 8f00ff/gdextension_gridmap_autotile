@@ -1,0 +1,23 @@
+# gitattributes
+
+[attr]txt      text eol=lf
+[attr]bin      filter=lfs diff=lfs merge=lfs -text binary
+
+*              text=auto
+
+.gitattributes txt export-ignore
+.gitignore     txt export-ignore
+.gitkeep       txt export-ignore
+.gitmodules    txt export-ignore
+*.cpp          txt diff=cpp
+*.godot        txt
+*.h            txt diff=cpp
+*.json         txt
+*.md           txt diff=markdown
+*.svg          txt
+*.tres         txt
+*.tscn         txt
+LICENSE        txt
+SConstruct     txt diff=python
+
+*.res          bin
