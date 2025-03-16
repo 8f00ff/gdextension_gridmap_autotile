@@ -1,19 +1,8 @@
 #include "grid_map_auto_tile.h"
-
 #include "editor/grid_map_cache_editor_plugin.h"
-
-#include <godot_cpp/core/print_string.hpp> // DEBUG
-
 #include <godot_cpp/classes/mesh_library.hpp>
 
-const std::map<int32_t, int32_t> GridMapAutoTile::ORIENTATIONS[] = {
-	{{0, 0}},
-	{{1, 0}, {2, 22}, {4, 10}, {8, 16}},
-	{{3, 16}, {6, 0}, {9, 10}, {12, 22}},
-	{{5, 0}, {10, 16}},
-	{{7, 0}, {11, 16}, {13, 10}, {14, 22}},
-	{{15, 0}}
-};
+const uint32_t GridMapAutoTile::ORIENTATIONS[4] = {0, 16, 10, 22};
 
 const std::map<int, Vector3i> GridMapAutoTile::DIRECTIONS = {
 	{NORTH, Vector3i(0, 0, -1)},
@@ -197,42 +186,47 @@ TypedArray<Vector3i> GridMapAutoTile::get_valid_neighbors(const Vector3i &p_posi
 }
 
 Dictionary GridMapAutoTile::calculate_autotiled_cell(const Vector3i &p_position, const int32_t p_item, const String &variant) const {
+	int32_t item = INVALID_CELL_ITEM;
+	int32_t orientation = 0;
+	
 	String type = get_cell_item_type(p_item);
 	if (type.is_empty()) {
 		return Dictionary();
 	}
-	int32_t bitmask = calculate_bitmask(p_position, type);
-	int32_t target_item = INVALID_CELL_ITEM;
-	int32_t target_orientation = 0;
 	
-	for (const auto& group : ORIENTATIONS) {
-		if (group.find(bitmask) != group.end()) {
-			for (const auto& pair : group) {
-				int32_t equivalent = pair.first;
-				String target_name = type + String("-") + itos(equivalent);
-				String target_name_variant = target_name;
-				if (!variant.is_empty()) {
-					target_name_variant = type + String("-") + itos(equivalent) + String("-") + variant;
-				}
-				target_item = get_mesh_library()->find_item_by_name(target_name_variant);
-				if (target_item == INVALID_CELL_ITEM) {
-					target_item = get_mesh_library()->find_item_by_name(target_name);
-				}
-				if (target_item != INVALID_CELL_ITEM) {
-					target_orientation = group.at(bitmask);
-					break;
-				}
-			}
-			if (target_item != INVALID_CELL_ITEM) {
-				break;
-			}
+	int32_t bitmask = calculate_bitmask(p_position, type);
+	print_line(String("need: ") + itos(bitmask));
+	
+	for (int i = 0; i < 4; i++) {
+		String name = type + String("-") + itos(bitmask);
+		String name_variant = name + String("-") + variant;
+		
+		item = get_mesh_library()->find_item_by_name(name_variant);
+		if (item == INVALID_CELL_ITEM) {
+			item = get_mesh_library()->find_item_by_name(name);
 		}
+		if (item != INVALID_CELL_ITEM) {
+			orientation = ORIENTATIONS[i];
+			break;
+		}
+		
+		int32_t bitmask_bits[4] = {
+			bitmask & NORTH,
+			bitmask & EAST,
+			bitmask & SOUTH,
+			bitmask & WEST,
+		};
+		bitmask = 0;
+		if (bitmask_bits[3] != 0) bitmask |= NORTH;
+		if (bitmask_bits[0] != 0) bitmask |= EAST;
+		if (bitmask_bits[1] != 0) bitmask |= SOUTH;
+		if (bitmask_bits[2] != 0) bitmask |= WEST;
 	}
 	
-	Dictionary target = Dictionary();
-	target["item"] = target_item;
-	target["orientation"] = target_orientation;
-	return target;
+	Dictionary result = Dictionary();
+	result["item"] = item;
+	result["orientation"] = orientation;
+	return result;
 }
 
 void GridMapAutoTile::_bind_methods() {

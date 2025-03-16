@@ -43,20 +43,20 @@ protected:
 	
 	Dictionary calculate_autotiled_cell(const Vector3i &p_position, const int32_t p_item, const String &variant = "") const;
 	
-	static const std::map<int32_t, int32_t> ORIENTATIONS[];
-	static const std::map<int32_t, Vector3i> DIRECTIONS;
-	
 	#ifdef TOOLS_ENABLED
 	GridMapCacheEditorPlugin *grid_map_cache = nullptr;
 	#endif
 	
 public:
 	enum Direction {
-		NORTH = 1,
-		EAST = 2,
-		SOUTH = 4,
-		WEST = 8
+		NORTH = 1, // -Z
+		EAST  = 2, // +X
+		SOUTH = 4, // +Z
+		WEST  = 8  // -X
 	};
+	
+	static const uint32_t ORIENTATIONS[4];
+	static const std::map<int32_t, Vector3i> DIRECTIONS;
 	
 	#ifdef TOOLS_ENABLED
 	GridMapCacheEditorPlugin* get_grid_map_cache() const;

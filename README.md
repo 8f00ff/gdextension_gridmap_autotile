@@ -31,27 +31,29 @@ type-bitmask[-variant]
 - `bitmask` is a number that defines the tile's connections (see below).
 - `variant` is an optional string that identifies a specific variant of the tile.
 
-### Bitmasks
+### Tile Connections & Bitmasks
 
-The bitmask is a number that defines the tile's connections. Here's what each bit corresponds to:
+GridMapAutoTile uses a simple bitmask system to determine how tiles connect. Each cardinal direction gets its own number:
 
-- `0`: no connections
-- `1`, `2`, `4`, `8`: edge pieces (connecting to one neighbor)
-- `3`, `6`, `9`, `12`: corner pieces (connecting to two neighbors)
-- `5`, `10`: straight pieces (connecting to two neighbors)
-- `7`, `11`, `13`, `14`: T-junctions (connecting to three neighbors)
-- `15`: cross junction (connecting to four neighbors)
+- NORTH (negative Z): `1`
+- EAST (positive X): `2`
+- SOUTH (positive Z): `4`
+- WEST (negative X): `8`
 
-### Rotations
+To create tiles with specific connections, just add these numbers together! For example:
+- A straight pipe going East to West? That's 2+8=10
+- A corner piece connecting North and East? That's 1+2=3
+- T-junction open on three sides? Just add the directions you need
 
-The initial rotations for each tile type are:
+### Automatic Rotations
 
-- **Edge pieces**: facing negative direction on X axis
-- **Straight pieces**: aligned with the X axis
-- **Corner pieces**: connecting negative direction on X axis and negative direction on Z axis
-- **T-junctions**: facing negative direction on Z axis
+The best part - you only need ONE mesh for each tile type! The system automatically rotates your tiles to match whatever connections are needed.
 
-Note that you don't need to create separate meshes for each rotation of a tile. GridMapAutoTile will automatically rotate the tile to match the required bitmask.
+For consistency, create your base tiles with these orientations:
+- Edge tiles: Connecting to the North
+- Corner tiles: Connecting to North and East 
+- Straight tiles: Connecting North to South
+- T-junctions: Connecting in all directions except West
 
 ### Placing tiles
 
